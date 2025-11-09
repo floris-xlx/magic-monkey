@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "Outlook Webhook API",
+    "_postman_id": "00000000-0000-0000-0000-000000000000",
+    "description": "Collection for managing Microsoft Graph subscriptions and testing the Outlook webhook endpoint.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Subscription",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{OUTLOOK_TOKEN}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"notificationUrl\": \"{{NOTIFICATION_URL}}\"\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/subscribe",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "subscribe"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Webhook Validation",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{BASE_URL}}/outlook/webhook?validationToken=example-token",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "outlook",
+            "webhook"
+          ],
+          "query": [
+            {
+              "key": "validationToken",
+              "value": "example-token"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Webhook Notification",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"value\": [\n    {\n      \"subscriptionId\": \"sub-id\",\n      \"changeType\": \"created\",\n      \"resource\": \"me/messages/AAMkAGY1\",\n      \"resourceData\": {\n        \"@odata.type\": \"#Microsoft.OutlookServices.Message\",\n        \"id\": \"AAMkAGY1\"\n      }\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/outlook/webhook",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "outlook",
+            "webhook"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "https://your-domain.example.com"
+    },
+    {
+      "key": "OUTLOOK_TOKEN",
+      "value": ""
+    },
+    {
+      "key": "NOTIFICATION_URL",
+      "value": "https://your-domain.example.com/outlook/webhook"
+    }
+  ]
+}
+
+

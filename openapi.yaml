@@ -1,0 +1,119 @@
+openapi: 3.1.0
+info:
+  title: Outlook Webhook API
+  version: 1.0.0
+  description: API to manage Microsoft Graph webhook subscriptions and handle Outlook notifications.
+servers:
+  - url: https://your-domain.example.com
+paths:
+  /subscribe:
+    post:
+      summary: Create Microsoft Graph subscription
+      description: Creates a Microsoft Graph subscription for new Outlook messages.
+      tags:
+        - Subscriptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - notificationUrl
+              properties:
+                notificationUrl:
+                  type: string
+                  format: uri
+                  description: HTTPS endpoint Microsoft Graph will call for notifications.
+      responses:
+        "200":
+          description: Subscription created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphSubscription"
+        "400":
+          description: Invalid request payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Missing or invalid Outlook token.
+        "500":
+          description: Server error while creating subscription.
+  /outlook/webhook:
+    post:
+      summary: Microsoft Graph webhook endpoint
+      description: Receives validation challenges and notifications from Microsoft Graph for Outlook messages.
+      tags:
+        - Webhooks
+      parameters:
+        - name: validationToken
+          in: query
+          description: Validation token supplied by Microsoft Graph during subscription validation.
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GraphNotificationPayload"
+      responses:
+        "200":
+          description: Validation response echoed back to Microsoft Graph.
+          content:
+            text/plain:
+              schema:
+                type: string
+        "202":
+          description: Notification accepted for processing.
+        "500":
+          description: Server error while processing the notification.
+components:
+  schemas:
+    GraphSubscription:
+      type: object
+      properties:
+        id:
+          type: string
+        resource:
+          type: string
+        changeType:
+          type: string
+        expirationDateTime:
+          type: string
+          format: date-time
+    GraphNotificationPayload:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              subscriptionId:
+                type: string
+              subscriptionExpirationDateTime:
+                type: string
+                format: date-time
+              changeType:
+                type: string
+              resource:
+                type: string
+              resourceData:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  odataType:
+                    type: string
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+
+
